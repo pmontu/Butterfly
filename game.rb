@@ -12,7 +12,7 @@ class MyWindow < Gosu::Window
 		(1..5).each do |yi|
 			li = []
 			(1..7).each do |xi|
-				@locations.push([640/8 * xi, 480/6 * yi])
+				@locations.push({ "x" => 640/8 * xi, "y" => 480/6 * yi})
 			end
 		end
 
@@ -20,12 +20,12 @@ class MyWindow < Gosu::Window
 
 		@leaves = []
 		@locations[0..19].each do |point|
-			@leaves.push(Leaf.new(self,point[0],point[1]))
+			@leaves.push(Leaf.new(self,point["x"],point["y"]))
 		end
 
 		@flowers = []
 		@locations[20..26].each do |point|
-			@flowers.push(Flower.new(self,point[0],point[1]))
+			@flowers.push(Flower.new(self,point["x"],point["y"]))
 		end
 
 	end
