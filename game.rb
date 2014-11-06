@@ -1,4 +1,3 @@
-require 'rubygems' # only necessary in Ruby 1.8
 require 'gosu'
 
 class MyWindow < Gosu::Window
@@ -12,20 +11,32 @@ class MyWindow < Gosu::Window
 		(1..5).each do |yi|
 			li = []
 			(1..7).each do |xi|
-				@locations.push({ "x" => 640/8 * xi, "y" => 480/6 * yi})
+				quadrant = 0
+				if xi<=3 and yi<=2
+					quadrant = 1
+				elsif xi>=5 and yi<=2
+						quadrant = 2
+				elsif xi<=3 and yi>=4
+					quadrant = 3
+				elsif xi>=5 and yi>=4
+					quadrant = 4
+				end
+				@locations.push({ "x" => 640/8 * xi, "y" => 480/6 * yi, "q" => quadrant})
 			end
 		end
 
 		@locations.shuffle!
 
+		@flowers = []
+		(1..4).each do |quadrant|
+			location = @locations.find { |location| location["q"]==quadrant}
+			@flowers.push(Flower.new(self,location["x"],location["y"]))
+			@locations.delete(location)
+		end
+
 		@leaves = []
 		@locations[0..19].each do |point|
 			@leaves.push(Leaf.new(self,point["x"],point["y"]))
-		end
-
-		@flowers = []
-		@locations[20..26].each do |point|
-			@flowers.push(Flower.new(self,point["x"],point["y"]))
 		end
 
 	end
@@ -40,11 +51,6 @@ class MyWindow < Gosu::Window
 	  	@background_image.draw(0, 0, 0, fx, fy)
 	  	@leaves.each { |leaf| leaf.draw }
 	  	@flowers.each { |flower| flower.draw }
-
-	  	@locations.each do |point|
-	  		#draw_line(point[0]-10, point[1]-10, Gosu::Color.argb(0xff000000), point[0]+10, point[1]+10, Gosu::Color.argb(0xff000000))
-	  		#draw_line(point[0]-10, point[1]+10, Gosu::Color.argb(0xff000000), point[0]+10, point[1]-10, Gosu::Color.argb(0xff000000))
-	  	end
   	end
 end
 
@@ -73,8 +79,6 @@ class Leaf
 		@img.draw(@x - (scale * @img.width) / 2, @y - (scale * @img.height) / 2, 0, scale, scale)
 	end
 end
-
-
 
 
 window = MyWindow.new
