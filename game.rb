@@ -15,7 +15,7 @@ class MyWindow < Gosu::Window
 				if xi<=3 and yi<=2
 					quadrant = 1
 				elsif xi>=5 and yi<=2
-						quadrant = 2
+					quadrant = 2
 				elsif xi<=3 and yi>=4
 					quadrant = 3
 				elsif xi>=5 and yi>=4
@@ -39,6 +39,8 @@ class MyWindow < Gosu::Window
 			@leaves.push(Leaf.new(self,point["x"],point["y"]))
 		end
 
+		@butterfly = Butterfly.new(self)
+
 	end
   
 	def update
@@ -51,6 +53,7 @@ class MyWindow < Gosu::Window
 	  	@background_image.draw(0, 0, 0, fx, fy)
 	  	@leaves.each { |leaf| leaf.draw }
 	  	@flowers.each { |flower| flower.draw }
+	  	@butterfly.draw
   	end
 end
 
@@ -77,6 +80,18 @@ class Leaf
 	def draw
 		scale = 0.075
 		@img.draw(@x - (scale * @img.width) / 2, @y - (scale * @img.height) / 2, 0, scale, scale)
+	end
+end
+
+class Butterfly
+	def initialize(window)
+		@x = 300
+		@y = 300
+		@animation = Gosu::Image::load_tiles(window, "media/B-martin87_butterfly.png", -7, -1, false)
+	end
+	def draw
+		img = @animation[Gosu::milliseconds / 100 % @animation.size];
+		img.draw(@x - img.width / 2.0, @y - img.height / 2.0, 0)
 	end
 end
 
