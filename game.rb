@@ -39,12 +39,15 @@ class MyWindow < Gosu::Window
 			@leaves.push(Leaf.new(self,point["x"],point["y"]))
 		end
 
-		@butterfly = Butterfly.new(self)
+		@butterflys = []
+		@flowers.sample(2).each { |leaf| @butterflys.push(Butterfly.new(self, leaf.x, leaf.y))}
+
+		@message = Gosu::Font.new(self, "Times New Roman", 50)
 
 	end
   
 	def update
-
+		@butterflys.each { |butterfly| butterfly.move }
 	end
 
 	def draw
@@ -53,11 +56,18 @@ class MyWindow < Gosu::Window
 	  	@background_image.draw(0, 0, 0, fx, fy)
 	  	@leaves.each { |leaf| leaf.draw }
 	  	@flowers.each { |flower| flower.draw }
-	  	@butterfly.draw
+		@butterflys.each { |butterfly| butterfly.draw }
+
+		@message.draw(@test, 0, 0, 0, 1, 1, Gosu::Color.new(0xff000000))
+	  	#@locations.each do |l|
+	  	#	draw_line(l["x"]-10,l["y"],Gosu::Color.new(0xff000000),l["x"]+10,l["y"],Gosu::Color.new(0xff000000),0)
+	  	#	draw_line(l["x"],l["y"]-10,Gosu::Color.new(0xff000000),l["x"],l["y"]+10,Gosu::Color.new(0xff000000),0)
+	  	#end
   	end
 end
 
 class Flower
+	attr_reader :x, :y
 	def initialize(window, x, y)
 		@x = x
 		@y = y
@@ -71,6 +81,7 @@ class Flower
 end
 
 class Leaf
+	attr_reader :x, :y
 	def initialize(window, x, y)
 		@x = x
 		@y = y
@@ -84,15 +95,24 @@ class Leaf
 end
 
 class Butterfly
-	def initialize(window)
-		@x = 300
-		@y = 300
-		@animation = Gosu::Image::load_tiles(window, "media/B-martin87_butterfly.png", -7, -1, false)
+	def initialize(window, x, y)
+		@x = x
+		@y = y
+		#@animation = Gosu::Image::load_tiles(window, "media/B-martin87_butterfly.png", -7, -1, false)
+		@animation = Gosu::Image::load_tiles(window, "media/npc_butterfly__x1_fly-side_png_1354829525.png", -14, -6, false)
 	end
+
 	def draw
 		img = @animation[Gosu::milliseconds / 100 % @animation.size];
-		img.draw(@x - img.width / 2.0, @y - img.height / 2.0, 0)
+		img.draw(@x - img.width / 2 -10, @y - img.height / 2 - 10, 0)
 	end
+
+	def move
+		#if Gosu::distance(@x, @y, @flower.x, @flower.y) > 0 then
+		#	@x += (@flower.x-@x)/20
+		#	@y += (@flower.y-@y)/20
+		#end
+	end 
 end
 
 
