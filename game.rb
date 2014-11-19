@@ -1,48 +1,66 @@
 require 'gosu'
 
 class MyWindow < Gosu::Window
+
+	@@QUADRANT = {"LEFT_TOP" => 1, "RIGHT_TOP" => 2, "LEFT_BOTTOM" => 3, "RIGHT_BOTTOM" => 4}
+
+	def getLocations(xsteps, ysteps)
+		locations = []
+		(1..ysteps-1).each do |yi|
+			(1..xsteps-1).each do |xi|
+				if xi<=xsteps/2 and yi<=ysteps/2
+					quadrant = @@QUADRANT["LEFT_TOP"]
+				elsif xi>xsteps/2 and yi<=ysteps/2
+					quadrant = @@QUADRANT["RIGHT_TOP"]
+				elsif xi<=xsteps/2 and yi>ysteps/2
+					quadrant = @@QUADRANT["LEFT_BOTTOM"]
+				elsif xi>xsteps/2 and yi>ysteps/2
+					quadrant = @@QUADRANT["RIGHT_BOTTOM"]
+				end
+				locations.push({ "x" => self.width.to_f/xsteps * xi, "y" => self.height.to_f/ysteps * yi, "q" => quadrant})
+			end
+		end
+		return locations
+	end
+
 	def initialize
-		super(640, 480, false)
+		super(1024, 768, false)
 		self.caption = 'Butterfly Game'
+
+		@ROWS = 7
+		@COLUMNS = 9
+		@FLOWERS_PER_QUADRANT = 2
+		@PERCENTAGE_OF_LEAVES = 0.5
 
 		@background_image = Gosu::Image.new(self, "media/SkyGround.jpg", true)
 
-		@locations = []
-		(1..5).each do |yi|
-			li = []
-			(1..7).each do |xi|
-				quadrant = 0
-				if xi<=3 and yi<=2
-					quadrant = 1
-				elsif xi>=5 and yi<=2
-					quadrant = 2
-				elsif xi<=3 and yi>=4
-					quadrant = 3
-				elsif xi>=5 and yi>=4
-					quadrant = 4
-				end
-				@locations.push({ "x" => 640/8 * xi, "y" => 480/6 * yi, "q" => quadrant})
-			end
-		end
+		# locations
+		@locations = getLocations(@COLUMNS, @ROWS)
 
 		@locations.shuffle!
 
+		# flowers
 		@flowers = []
-		(1..4).each do |quadrant|
+		(@@QUADRANT.values*2).each do |quadrant|
 			location = @locations.find { |location| location["q"]==quadrant}
 			@flowers.push(Flower.new(self,location["x"],location["y"]))
 			@locations.delete(location)
 		end
 
+		# leaves
 		@leaves = []
-		@locations[0..19].each do |point|
+		leaves_number = ((@ROWS-1)*(@COLUMNS-1)*@PERCENTAGE_OF_LEAVES).to_i
+		@locations[0..(leaves_number-1)].each do |point|
 			@leaves.push(Leaf.new(self,point["x"],point["y"]))
 		end
 
+		# butterflys
 		@butterflys = []
 		@flowers.sample(2).each { |leaf| @butterflys.push(Butterfly.new(self, leaf.x, leaf.y))}
 
-		@message = Gosu::Font.new(self, "Times New Roman", 50)
+		# score
+		@hud = Gosu::Font.new(self, "media/Bangers.TTF", 35)
+		@score = 1024
 
 	end
   
@@ -51,14 +69,13 @@ class MyWindow < Gosu::Window
 	end
 
 	def draw
-		fx = 640.0 / @background_image.width
-		fy = 480.0 / @background_image.height
+		fx = self.width.to_f / @background_image.width
+		fy = self.height.to_f / @background_image.height
 	  	@background_image.draw(0, 0, 0, fx, fy)
 	  	@leaves.each { |leaf| leaf.draw }
 	  	@flowers.each { |flower| flower.draw }
 		@butterflys.each { |butterfly| butterfly.draw }
-
-		@message.draw(@test, 0, 0, 0, 1, 1, Gosu::Color.new(0xff000000))
+		@hud.draw(@score, 20, 10, 0, 1, 1, Gosu::Color.new(0x9f007d00))
 	  	#@locations.each do |l|
 	  	#	draw_line(l["x"]-10,l["y"],Gosu::Color.new(0xff000000),l["x"]+10,l["y"],Gosu::Color.new(0xff000000),0)
 	  	#	draw_line(l["x"],l["y"]-10,Gosu::Color.new(0xff000000),l["x"],l["y"]+10,Gosu::Color.new(0xff000000),0)
