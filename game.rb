@@ -1,4 +1,7 @@
 require 'gosu'
+require_relative 'flower.rb'
+require_relative 'leaf.rb'
+require_relative 'butterfly.rb'
 
 class MyWindow < Gosu::Window
 
@@ -56,7 +59,15 @@ class MyWindow < Gosu::Window
 
 		# butterflys
 		@butterflys = []
-		@flowers.sample(2).each { |leaf| @butterflys.push(Butterfly.new(self, leaf.x, leaf.y))}
+		(1..1).each do
+			destination_x = []
+			destination_y = []
+			@flowers.sample(2).each do |flower|
+				destination_x.push(flower.x)
+				destination_y.push(flower.y)
+			end
+			@butterflys.push(Butterfly.new(self, destination_x, destination_y))
+		end
 
 		# score
 		@hud = Gosu::Font.new(self, "media/Bangers.TTF", 35)
@@ -69,9 +80,7 @@ class MyWindow < Gosu::Window
 	end
 
 	def draw
-		fx = self.width.to_f / @background_image.width
-		fy = self.height.to_f / @background_image.height
-	  	@background_image.draw(0, 0, 0, fx, fy)
+	  	@background_image.draw(0, 0, 0, self.width.to_f / @background_image.width, self.height.to_f / @background_image.height)
 	  	@leaves.each { |leaf| leaf.draw }
 	  	@flowers.each { |flower| flower.draw }
 		@butterflys.each { |butterfly| butterfly.draw }
@@ -83,54 +92,7 @@ class MyWindow < Gosu::Window
   	end
 end
 
-class Flower
-	attr_reader :x, :y
-	def initialize(window, x, y)
-		@x = x
-		@y = y
-		@img = Gosu::Image.new(window, "media/bagonia.png", true)
-	end
 
-	def draw
-		scale = 0.15
-		@img.draw(@x - (scale * @img.width) / 2, @y - (scale * @img.height) / 2, 0, scale, scale)
-	end
-end
-
-class Leaf
-	attr_reader :x, :y
-	def initialize(window, x, y)
-		@x = x
-		@y = y
-		@img = Gosu::Image.new(window, "media/autumn_leaves_PNG3611.png", true)
-	end
-
-	def draw
-		scale = 0.075
-		@img.draw(@x - (scale * @img.width) / 2, @y - (scale * @img.height) / 2, 0, scale, scale)
-	end
-end
-
-class Butterfly
-	def initialize(window, x, y)
-		@x = x
-		@y = y
-		#@animation = Gosu::Image::load_tiles(window, "media/B-martin87_butterfly.png", -7, -1, false)
-		@animation = Gosu::Image::load_tiles(window, "media/npc_butterfly__x1_fly-side_png_1354829525.png", -14, -6, false)
-	end
-
-	def draw
-		img = @animation[Gosu::milliseconds / 100 % @animation.size];
-		img.draw(@x - img.width / 2 -10, @y - img.height / 2 - 10, 0)
-	end
-
-	def move
-		#if Gosu::distance(@x, @y, @flower.x, @flower.y) > 0 then
-		#	@x += (@flower.x-@x)/20
-		#	@y += (@flower.y-@y)/20
-		#end
-	end 
-end
 
 
 window = MyWindow.new
