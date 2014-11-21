@@ -40,7 +40,7 @@ class MyWindow < Gosu::Window
 		# locations
 		@locations = getLocations(@COLUMNS, @ROWS)
 
-		@locations.shuffle!
+		@locations.shuffle!(random: Random.new(1))
 
 		# flowers
 		@flowers = []
@@ -62,7 +62,7 @@ class MyWindow < Gosu::Window
 		(1..1).each do
 			destination_x = []
 			destination_y = []
-			@flowers.sample(2).each do |flower|
+			@flowers[0,2].each do |flower|
 				destination_x.push(flower.x)
 				destination_y.push(flower.y)
 			end
@@ -84,15 +84,21 @@ class MyWindow < Gosu::Window
 	  	@leaves.each { |leaf| leaf.draw }
 	  	@flowers.each { |flower| flower.draw }
 		@butterflys.each { |butterfly| butterfly.draw }
-		@hud.draw(@score, 20, 10, 0, 1, 1, Gosu::Color.new(0x9f007d00))
+		[@butterflys[0].x.round(0), @butterflys[0].y.round(0), @butterflys[0].journey_frame].each_with_index do |text, i|
+			@hud.draw(text, 20, i*@hud.height+10, 0, 1, 1, Gosu::Color.new(0x9f007d00))
+		end
+
+
 	  	#@locations.each do |l|
-	  	#	draw_line(l["x"]-10,l["y"],Gosu::Color.new(0xff000000),l["x"]+10,l["y"],Gosu::Color.new(0xff000000),0)
-	  	#	draw_line(l["x"],l["y"]-10,Gosu::Color.new(0xff000000),l["x"],l["y"]+10,Gosu::Color.new(0xff000000),0)
-	  	#end
+	  	[[@butterflys[0].start_x, @butterflys[0].start_y], [@butterflys[0].end_x, @butterflys[0].end_y]].each_with_index do |point, i|
+	  		l = {}
+	  		l["x"], l["y"] = point[0], point[1]
+	  		r = (i+1) * 10
+	  		draw_line(l["x"]-r,l["y"],Gosu::Color.new(0xff000000),l["x"]+r,l["y"],Gosu::Color.new(0xff000000),0)
+	  		draw_line(l["x"],l["y"]-r,Gosu::Color.new(0xff000000),l["x"],l["y"]+r,Gosu::Color.new(0xff000000),0)
+	  	end
   	end
 end
-
-
 
 
 window = MyWindow.new
