@@ -24,13 +24,19 @@ class Butterfly
 		@sit_time = 1 * 60
 		@journey_frame = 1
 		@state = State::FLY
+
+
+		if not @user_responded
+			@score.misses += 1
+		end
 	end
 
 	def respond
 
-		if @state == State::SIT
+		if @state == State::SIT and @user_responded == false
 			@score.correct += 1
-		else
+			@user_responded = true
+		elsif @state == State::FLY
 			@score.error += 1
 		end
 	end
@@ -38,6 +44,7 @@ class Butterfly
 	def new_sit
 		@sit_frame = 1
 		@state = State::SIT
+		@user_responded = false
 	end
 
 	def draw

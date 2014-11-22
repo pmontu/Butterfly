@@ -28,6 +28,14 @@ class MyWindow < Gosu::Window
 		return locations
 	end
 
+	def format_milisecs(m)
+		secs, milisecs = m.divmod(1000)
+		mins, secs = secs.divmod(60)
+		hours, mins = mins.divmod(60)
+
+		[hours,mins,secs].map { |e| e.to_s.rjust(2,'0') }.join ':'
+	end
+
 	def initialize
 		super(1024, 768, false)
 		self.caption = 'Butterfly Game'
@@ -86,7 +94,14 @@ class MyWindow < Gosu::Window
 		@butterflys.each { |butterfly| butterfly.draw }
 		
 		#[@butterflys[0].x.round(0), @butterflys[0].y.round(0), @butterflys[0].journey_frame].each_with_index do |text, i|
-		[["Score",0x9f00007d],["+" + @butterflys[0].score.correct.to_s,0x9f007d00],["-" + @butterflys[0].score.error.to_s,0x9f7d0000]].each_with_index do |item, i|
+		[
+			["Score",0x9f00007d],
+			[@butterflys[0].score.correct.to_s + " correct",0x9f007d00],
+			[@butterflys[0].score.error.to_s + " errors",0x9f7d0000],
+			[@butterflys[0].score.misses.to_s + " misses",0x9fAA0000],
+			["Time",0x9f00007d],
+			[format_milisecs(Gosu::milliseconds),0x9f00AA00]
+		].each_with_index do |item, i|
 			text, color = item[0], item[1]
 			@hud.draw(text, 20, i*@hud.height+10, 0, 1, 1, Gosu::Color.new(color))
 		end
