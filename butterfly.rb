@@ -1,5 +1,5 @@
 class Butterfly
-	attr_reader :x, :y, :start, :journey_frame, :end
+	attr_reader :x, :y, :start, :journey_frame, :end, :score
 
 	module State
 		FLY = 1
@@ -9,6 +9,7 @@ class Butterfly
 	def initialize(window, flowers, leaves)
 		@flowers = flowers
 		@leaves = leaves
+		@score = Score.new
 		new_journey @flowers.first
 		@animation = Gosu::Image::load_tiles(window, "media/npc_butterfly__x1_fly-side_png_1354829525.png", -14, -6, false)
 
@@ -23,6 +24,15 @@ class Butterfly
 		@sit_time = 1 * 60
 		@journey_frame = 1
 		@state = State::FLY
+	end
+
+	def respond
+
+		if @state == State::SIT
+			@score.correct += 1
+		else
+			@score.error += 1
+		end
 	end
 
 	def new_sit

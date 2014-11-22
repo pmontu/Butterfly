@@ -2,6 +2,8 @@ require 'gosu'
 require_relative 'flower.rb'
 require_relative 'leaf.rb'
 require_relative 'butterfly.rb'
+require_relative 'score.rb'
+
 
 class MyWindow < Gosu::Window
 
@@ -66,6 +68,12 @@ class MyWindow < Gosu::Window
 		@score = 1024
 
 	end
+
+	def button_up(id)
+		if id == Gosu::KbSpace
+			@butterflys[0].respond
+		end
+	end
   
 	def update
 		@butterflys.each { |butterfly| butterfly.move }
@@ -76,10 +84,12 @@ class MyWindow < Gosu::Window
 	  	@leaves.each { |leaf| leaf.draw }
 	  	@flowers.each { |flower| flower.draw }
 		@butterflys.each { |butterfly| butterfly.draw }
-		[@butterflys[0].x.round(0), @butterflys[0].y.round(0), @butterflys[0].journey_frame].each_with_index do |text, i|
-			@hud.draw(text, 20, i*@hud.height+10, 0, 1, 1, Gosu::Color.new(0x9f007d00))
+		
+		#[@butterflys[0].x.round(0), @butterflys[0].y.round(0), @butterflys[0].journey_frame].each_with_index do |text, i|
+		[["Score",0x9f00007d],["+" + @butterflys[0].score.correct.to_s,0x9f007d00],["-" + @butterflys[0].score.error.to_s,0x9f7d0000]].each_with_index do |item, i|
+			text, color = item[0], item[1]
+			@hud.draw(text, 20, i*@hud.height+10, 0, 1, 1, Gosu::Color.new(color))
 		end
-
 
 	  	#@locations.each do |l|
 	  	[[@butterflys[0].start.x, @butterflys[0].start.y], [@butterflys[0].end.x, @butterflys[0].end.y]].each_with_index do |point, i|
