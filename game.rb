@@ -59,15 +59,7 @@ class MyWindow < Gosu::Window
 
 		# butterflys
 		@butterflys = []
-		(1..1).each do
-			destination_x = []
-			destination_y = []
-			@flowers[0,2].each do |flower|
-				destination_x.push(flower.x)
-				destination_y.push(flower.y)
-			end
-			@butterflys.push(Butterfly.new(self, destination_x, destination_y))
-		end
+		@butterflys.push(Butterfly.new(self, @flowers, @leaves))
 
 		# score
 		@hud = Gosu::Font.new(self, "media/Bangers.TTF", 35)
@@ -90,7 +82,7 @@ class MyWindow < Gosu::Window
 
 
 	  	#@locations.each do |l|
-	  	[[@butterflys[0].start_x, @butterflys[0].start_y], [@butterflys[0].end_x, @butterflys[0].end_y]].each_with_index do |point, i|
+	  	[[@butterflys[0].start.x, @butterflys[0].start.y], [@butterflys[0].end.x, @butterflys[0].end.y]].each_with_index do |point, i|
 	  		l = {}
 	  		l["x"], l["y"] = point[0], point[1]
 	  		r = (i+1) * 10

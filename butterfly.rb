@@ -1,24 +1,33 @@
 class Butterfly
-	attr_reader :x, :y, :start_x, :start_y, :journey_frame, :end_x, :end_y
+	attr_reader :x, :y, :start, :journey_frame, :end
 
-	def initialize(window, dx, dy)
-		@destination_x = dx
-		@destination_y = dy
-		@start_x = @destination_x.first
-		@start_y = @destination_y.first
-		@end_x = @destination_x.last
-		@end_y = @destination_y.last
-		new_journey
+	module State
+		FLY = 1
+		SIT = 2
+	end
+
+	def initialize(window, flowers, leaves)
+		@flowers = flowers
+		@leaves = leaves
+		new_journey @flowers.first
 		@animation = Gosu::Image::load_tiles(window, "media/npc_butterfly__x1_fly-side_png_1354829525.png", -14, -6, false)
 
 	end
 
-	def new_journey
-		@x = @start_x
-		@y = @start_y
-		@fly_time = 60 * Gosu::distance(start_x, start_y, end_x, end_y).round / 100.0
+	def new_journey(start)
+		@start = start
+		@x, @y = @start.x, @start.y
+		@end = (@flowers - [@start]).sample
+		#@fly_time = 60 * Gosu::distance(@start.x, @start.y, @end.x, @end.y).round / 100.0
 		@fly_time = 6 * 60
+		@sit_time = 1 * 60
 		@journey_frame = 1
+		@state = State::FLY
+	end
+
+	def new_sit
+		@sit_frame = 1
+		@state = State::SIT
 	end
 
 	def draw
@@ -27,17 +36,23 @@ class Butterfly
 	end
 
 	def move
-		if @journey_frame < @fly_time
+		if @state == State::FLY
 
-			@x = @start_x + @journey_frame * (@end_x - @start_x) / @fly_time.to_f
-			@y = @start_y + @journey_frame * (@end_y - @start_y) / @fly_time.to_f
-			@journey_frame += 1
+			if @journey_frame < @fly_time
+				@x = @start.x + @journey_frame * (@end.x - @start.x) / @fly_time.to_f
+				@y = @start.y + @journey_frame * (@end.y - @start.y) / @fly_time.to_f
+				@journey_frame += 1
+			else
+				new_sit
+			end
 
-		else
+		elsif @state == State::SIT
 
-			@start_x ,@end_x = @end_x, @start_x
-			@start_y ,@end_y = @end_y, @start_y
-			new_journey
+			if @sit_frame < @sit_time
+				@sit_frame += 1
+			else
+				new_journey @end
+			end
 		end
 
 	end
