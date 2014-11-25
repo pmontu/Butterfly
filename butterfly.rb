@@ -1,5 +1,5 @@
 class Butterfly
-	attr_reader :x, :y, :start, :journey_frame, :end, :score
+	attr_reader :x, :y, :start, :journey_frame, :end, :score, :journey_at
 
 	module State
 		FLY = 1
@@ -15,22 +15,6 @@ class Butterfly
 
 	end
 
-	def new_journey(start)
-		@start = start
-		@x, @y = @start.x, @start.y
-		@end = (@flowers - [@start]).sample
-		#@fly_time = 60 * Gosu::distance(@start.x, @start.y, @end.x, @end.y).round / 100.0
-		@fly_time = 6 * 60
-		@sit_time = 1 * 60
-		@journey_frame = 1
-		@state = State::FLY
-
-
-		if not @user_responded
-			@score.misses += 1
-		end
-	end
-
 	def respond
 
 		if @state == State::SIT and @user_responded == false
@@ -39,6 +23,26 @@ class Butterfly
 		elsif @state == State::FLY
 			@score.error += 1
 		end
+	end
+
+	def new_journey(start)
+
+		@journey = [start] + @leaves.sample(1) + (@flowers - [start]).sample(1)
+		@fly_time = 6 * 60
+		@sit_time = 1 * 60
+		@journey_at = 0
+		new_leap
+		@state = State::FLY
+
+		if not @user_responded
+			@score.misses += 1
+		end
+	end
+
+	def new_leap
+		@start, @end = @journey[@journey_at], @journey[@journey_at+1]
+		@journey_frame = 1
+		@journey_at += 1
 	end
 
 	def new_sit
@@ -51,7 +55,7 @@ class Butterfly
 		img = @animation[Gosu::milliseconds / 100 % @animation.size];
 		img.draw(@x - img.width / 2 -10, @y - img.height / 2 - 10, 0)
 	end
-
+	
 	def move
 		if @state == State::FLY
 
@@ -60,7 +64,11 @@ class Butterfly
 				@y = @start.y + @journey_frame * (@end.y - @start.y) / @fly_time.to_f
 				@journey_frame += 1
 			else
-				new_sit
+				if @journey_at + 1 < @journey.length
+					new_leap
+				else
+					new_sit
+				end
 			end
 
 		elsif @state == State::SIT
