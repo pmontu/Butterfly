@@ -56,6 +56,10 @@ class MyWindow < Gosu::Window
 		@PERCENTAGE_OF_LEAVES = 0.5
 
 		@background_image = Gosu::Image.new(self, "media/SkyGround.jpg", true)
+		@background_score = Gosu::Song.new(self, "media/ConcentrationMusic-HelpingYouFocusOnWork,Vol2.RelaxingRecords.mp3")
+		@background_score.play(ooping=true)
+		@welcoming_sound = Gosu::Sample.new(self,"media/235463__jcdecha__wind-chimes-single.wav")
+		@welcoming_sound.play
 
 		# locations
 		@locations = make_locations(@COLUMNS, @ROWS)
@@ -114,7 +118,7 @@ class MyWindow < Gosu::Window
 			["Time",0x9f00007d],
 			[format_milisecs(Gosu::milliseconds),0x9f00AA00],
 			["Debug",0x9f9f9f9f],
-			[@butterflys[0].journey_at,0x559f9f9f]
+			["j %s/%s" % [@butterflys[0].journey_at, @butterflys[0].journey_num],0x559f9f9f]
 		].each_with_index do |item, i|
 			text, color = item[0], item[1]
 			@hud.draw(text, 20, i*@hud.height+10, 0, 1, 1, Gosu::Color.new(color))
@@ -122,13 +126,13 @@ class MyWindow < Gosu::Window
 
 		# test
 	  	#@locations.each do |l|
-	  	[[@butterflys[0].start.x, @butterflys[0].start.y], [@butterflys[0].end.x, @butterflys[0].end.y]].each_with_index do |point, i|
-	  		l = {}
-	  		l["x"], l["y"] = point[0], point[1]
-	  		r = (i+1) * 10
-	  		draw_line(l["x"]-r,l["y"],Gosu::Color.new(0xff000000),l["x"]+r,l["y"],Gosu::Color.new(0xff000000),0)
-	  		draw_line(l["x"],l["y"]-r,Gosu::Color.new(0xff000000),l["x"],l["y"]+r,Gosu::Color.new(0xff000000),0)
-	  	end
+	  	#[[@butterflys[0].start.x, @butterflys[0].start.y], [@butterflys[0].end.x, @butterflys[0].end.y]].each_with_index do |point, i|
+	  	#	l = {}
+	  	#	l["x"], l["y"] = point[0], point[1]
+	  	#	r = (i+1) * 10
+	  	#	draw_line(l["x"]-r,l["y"],Gosu::Color.new(0xff000000),l["x"]+r,l["y"],Gosu::Color.new(0xff000000),0)
+	  	#	draw_line(l["x"],l["y"]-r,Gosu::Color.new(0xff000000),l["x"],l["y"]+r,Gosu::Color.new(0xff000000),0)
+	  	#end
   	end
 end
 

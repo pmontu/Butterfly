@@ -1,5 +1,5 @@
 class Butterfly
-	attr_reader :x, :y, :start, :journey_frame, :end, :score, :journey_at
+	attr_reader :x, :y, :start, :journey_frame, :end, :score, :journey_at, :journey_num
 
 	module State
 		FLY = 1
@@ -27,9 +27,18 @@ class Butterfly
 
 	def new_journey(start)
 
-		@journey = [start] + @leaves.sample(1) + (@flowers - [start]).sample(1)
-		@fly_time = 6 * 60
+		@journey_num = rand(2..5)
+		@journey = [start]
+		(1..@journey_num-1).each do |position|
+			if rand <= 1.0 / (@journey_num - position)
+				@journey += (@flowers - @journey).sample(1)
+			else
+				@journey += (@leaves - @journey).sample(1)
+			end
+		end
 		@sit_time = 1 * 60
+		#@fly_time = 60 * Gosu::distance(@start.x, @start.y, @end.x, @end.y).round / 100.0
+		@fly_time = [3,4,6].sample * 60
 		@journey_at = 0
 		new_leap
 		@state = State::FLY
@@ -55,7 +64,7 @@ class Butterfly
 		img = @animation[Gosu::milliseconds / 100 % @animation.size];
 		img.draw(@x - img.width / 2 -10, @y - img.height / 2 - 10, 0)
 	end
-	
+
 	def move
 		if @state == State::FLY
 
