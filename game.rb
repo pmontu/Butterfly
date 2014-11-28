@@ -56,10 +56,6 @@ class MyWindow < Gosu::Window
 		@PERCENTAGE_OF_LEAVES = 0.5
 
 		@background_image = Gosu::Image.new(self, "media/SkyGround.jpg", true)
-		@background_score = Gosu::Song.new(self, "media/ConcentrationMusic-HelpingYouFocusOnWork,Vol2.RelaxingRecords.mp3")
-		@background_score.play(ooping=true)
-		@welcoming_sound = Gosu::Sample.new(self,"media/235463__jcdecha__wind-chimes-single.wav")
-		@welcoming_sound.play
 
 		# locations
 		@locations = make_locations(@COLUMNS, @ROWS)
@@ -84,6 +80,8 @@ class MyWindow < Gosu::Window
 		# butterflys
 		@butterflys = []
 		@butterflys.push(Butterfly.new(self, @flowers, @leaves))
+		@butterflys.push(Butterfly.new(self, @flowers, @leaves))
+		@butterflys.push(Butterfly.new(self, @flowers, @leaves))
 
 		# score
 		@hud = Gosu::Font.new(self, "media/Bangers.TTF", 35)
@@ -94,6 +92,8 @@ class MyWindow < Gosu::Window
 	def button_up(id)
 		if id == Gosu::KbSpace
 			@butterflys[0].respond
+		elsif id == Gosu::Kb1
+			@butterflys.first.switch_highlight
 		end
 	end
   

@@ -1,18 +1,36 @@
 class Butterfly
 	attr_reader :x, :y, :start, :journey_frame, :end, :score, :journey_at, :journey_num
 
+	module Color
+		BLUE = 1
+		BROWN = 2
+	end
+
 	module State
 		FLY = 1
 		SIT = 2
 	end
 
-	def initialize(window, flowers, leaves)
+	def initialize(window, flowers, leaves, color = Color::BLUE)
 		@flowers = flowers
 		@leaves = leaves
+		@color = color
 		@score = Score.new
+		@highlight = false
 		new_journey @flowers.first
-		@animation = Gosu::Image::load_tiles(window, "media/npc_butterfly__x1_fly-side_png_1354829525.png", -14, -6, false)
+		if @color == Color::BLUE
+			@animation = Gosu::Image::load_tiles(window, "media/npc_butterfly__x1_fly-side_png_1354829525.png", -14, -6, false)
+			@animation_sit = Gosu::Image::load_tiles(window, "media/npc_butterfly__x1_fly-top_png_1354829528.png", -13, -7, false)
+		elsif @color = Color::BROWN
+			@animation = Gosu::Image::load_tiles(window, "media/B-martin87_butterfly.png", -7, -1, false)
+			@animation_sit = Gosu::Image::load_tiles(window, "media/B-martin87_butterfly.png", -7, -1, false)
+		end
+		@highlight_img = Gosu::Image.new(window, "media/glowing_circle_png_by_curemarinesunshine-d43156k.png", true)
 
+	end
+
+	def switch_highlight
+		@highlight = !@highlight
 	end
 
 	def respond
@@ -27,7 +45,7 @@ class Butterfly
 
 	def new_journey(start)
 
-		@journey_num = rand(2..5)
+		@journey_num = rand(2..4)
 		@journey = [start]
 		(1..@journey_num-1).each do |position|
 			if rand <= 1.0 / (@journey_num - position)
@@ -38,7 +56,7 @@ class Butterfly
 		end
 		@sit_time = 1 * 60
 		#@fly_time = 60 * Gosu::distance(@start.x, @start.y, @end.x, @end.y).round / 100.0
-		@fly_time = [3,4,6].sample * 60
+		@fly_time = [3,6].sample * 60
 		@journey_at = 0
 		new_leap
 		@state = State::FLY
@@ -61,8 +79,26 @@ class Butterfly
 	end
 
 	def draw
-		img = @animation[Gosu::milliseconds / 100 % @animation.size];
-		img.draw(@x - img.width / 2 -10, @y - img.height / 2 - 10, 0)
+
+		if @highlight
+			@highlight_img.draw_rot(@x,@y,0,Gosu::milliseconds / 10 % 360,0.5,0.5,0.2,0.2)
+		end
+
+		if @state == State::FLY
+			img = @animation[Gosu::milliseconds / 100 % @animation.size];
+		elsif @state == State::SIT
+			img = @animation_sit[Gosu::milliseconds / 10 % @animation.size];
+		end
+
+		if @color == Color::BLUE and @state == State::SIT
+			fx = fy = 0.8
+			img.draw(@x - (fx * img.width) / 2 - 6, @y - (fy * img.height) / 2, 0, fx, fy)
+		elsif @color == Color::BLUE and @state == State::FLY
+			img.draw(@x - img.width / 2 -10, @y - img.height / 2 - 10, 0)
+		elsif @color == Color::BROWN
+			fx = fy = 0.15
+			img.draw(@x - (fx * img.width) / 2, @y - (fy * img.height) / 2 + 10, 0, fx, fy)
+		end
 	end
 
 	def move
